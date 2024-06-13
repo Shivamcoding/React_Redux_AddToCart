@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Table from "react-bootstrap/Table";
 import Nav from "react-bootstrap/Nav";
@@ -6,14 +6,20 @@ import Navbar from "react-bootstrap/Navbar";
 import Badge from "@mui/material/Badge";
 import Menu from "@mui/material/Menu";
 import { NavLink } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import "./style.css";
+import { DLT } from "../redux/actions/action";
 
 const Header = () => {
   const getData = useSelector((state) => state.cartreducer.carts);
   //console.log(getData);
 
+  const dispatch = useDispatch();
+
   const [anchorEl, setAnchorEl] = useState(null);
+  const [price, setPrice] = useState(0);
+  //console.log(price);
+
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -21,6 +27,20 @@ const Header = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const dlt = (item) => {
+    dispatch(DLT(item));
+  };
+
+  const total = () => {
+    let price = 0;
+    getData.map((item) => (price = item.price + price));
+    setPrice(price);
+  };
+
+  useEffect(() => {
+    total();
+  }, [total]);
 
   return (
     <>
@@ -91,6 +111,7 @@ const Header = () => {
                             fontSize: 20,
                             cursor: "pointer",
                           }}
+                          onClick={() => dlt(item)}
                         >
                           <i className="fas fa-trash smalltrash"></i>
                         </p>
@@ -101,13 +122,14 @@ const Header = () => {
                           fontSize: 20,
                           cursor: "pointer",
                         }}
+                        onClick={() => dlt(item)}
                       >
                         <i className="fas fa-trash largetrash"></i>
                       </td>
                     </tr>
                   );
                 })}
-                <p className="text-center">Total: ₹500</p>
+                <p className="text-center">Total: ₹{price}</p>
               </tbody>
             </Table>
           </div>
