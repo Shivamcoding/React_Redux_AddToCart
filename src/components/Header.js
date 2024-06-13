@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import Container from "react-bootstrap/Container";
+import Table from "react-bootstrap/Table";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Badge from "@mui/material/Badge";
 import Menu from "@mui/material/Menu";
 import { NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
+import "./style.css";
 
 const Header = () => {
+  const getData = useSelector((state) => state.cartreducer.carts);
+  //console.log(getData);
+
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -32,7 +38,11 @@ const Header = () => {
               Home
             </NavLink>
           </Nav>
-          <Badge badgeContent={4} color="primary" onClick={handleClick}>
+          <Badge
+            badgeContent={getData.length < 1 ? "0" : getData.length}
+            color="primary"
+            onClick={handleClick}
+          >
             <i
               className="fa-solid fa-cart-shopping text-light"
               style={{ fontSize: "25px", cursor: "pointer" }}
@@ -50,29 +60,82 @@ const Header = () => {
           "aria-labelledby": "basic-button",
         }}
       >
-        <div
-          className="card_details d-flex justify-content-center align-items-center"
-          style={{ padding: 10, position: "relative" }}
-        >
-          <i
-            className="fas fa-close smallclose"
-            onClick={handleClose}
-            style={{
-              position: "absolute",
-              top: 2,
-              right: 20,
-              fontSize: "23px",
-              cursor: "pointer",
-            }}
-          ></i>
-          <p style={{ fontSize: 22 }}>Your cart is empty.</p>
-          <img
-            src="./cart.gif"
-            alt="cart"
-            className="emptycart_img"
-            style={{ width: "5rem", padding: 10 }}
-          />
-        </div>
+        {getData.length ? (
+          <div className="card_details" style={{ width: "24rem", padding: 10 }}>
+            <Table>
+              <thead>
+                <tr>
+                  <th>Photo</th>
+                  <th>Restaurant Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {getData?.map((item, id) => {
+                  return (
+                    <tr key={id}>
+                      <td>
+                        <NavLink to={`/cart/${item.id}`} onClick={handleClose}>
+                          <img
+                            src={item.imgdata}
+                            style={{ width: "5rem", height: "5rem" }}
+                          />
+                        </NavLink>
+                      </td>
+                      <td>
+                        <p>{item.rname}</p>
+                        <p>Price: ₹{item.price}</p>
+                        <p>Quantity: {item.qnty}</p>
+                        <p
+                          style={{
+                            color: "red",
+                            fontSize: 20,
+                            cursor: "pointer",
+                          }}
+                        >
+                          <i className="fas fa-trash smalltrash"></i>
+                        </p>
+                      </td>
+                      <td
+                        style={{
+                          color: "red",
+                          fontSize: 20,
+                          cursor: "pointer",
+                        }}
+                      >
+                        <i className="fas fa-trash largetrash"></i>
+                      </td>
+                    </tr>
+                  );
+                })}
+                <p className="text-center">Total: ₹500</p>
+              </tbody>
+            </Table>
+          </div>
+        ) : (
+          <div
+            className="card_details d-flex justify-content-center align-items-center"
+            style={{ padding: 10, position: "relative" }}
+          >
+            <i
+              className="fas fa-close smallclose"
+              onClick={handleClose}
+              style={{
+                position: "absolute",
+                top: 2,
+                right: 20,
+                fontSize: "23px",
+                cursor: "pointer",
+              }}
+            ></i>
+            <p style={{ fontSize: 22 }}>Your cart is empty.</p>
+            <img
+              src="./cart.gif"
+              alt="cart"
+              className="emptycart_img"
+              style={{ width: "5rem", padding: 10 }}
+            />
+          </div>
+        )}
       </Menu>
     </>
   );
